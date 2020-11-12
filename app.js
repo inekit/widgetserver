@@ -155,7 +155,7 @@ res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
         return next(err);
       }
       console.log(1)
-      return res.send(JSON.stringify(user));
+      return res.send(JSON.stringify({isAutenticated:true}));
       
     });
   })(req, res, next);
@@ -234,10 +234,15 @@ app.post("/delete", auth, (req, res) => {
 
 
 
-app.get("/id",  (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://81.176.228.81:8080');
-res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
-    return res.send({isAutenticated:true});
+app.get("/id", auth, (req, res) => {
+  var connection = mysql.createConnection(param);
+  idd = req.session.passport.user.toString();
+  const dialog = [idd];
+  const sql = "select id,nick from widget.users where id=(?) limit 1";
+  connection.query(sql, dialog, function (error, result, fields) {
+    return res.send(result);
+  });
+  connection.end();
 });
 
 
