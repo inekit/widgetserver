@@ -73,19 +73,13 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 var param = {
-  host: "localhost",
-  user: "client",
-  password: "12345678",
-  database: "widget",
-};
-var sesParams = {
-  host: "localhost",
-  user: "sessions",
-  password: "1234",
+  socketPath: "/var/run/mysqld/mysqld.sock",
+  user: "root",
+  password: "nicklzx",
   database: "widget",
 };
 
-var sessionConnection = mysql.createConnection(sesParams);
+var sessionConnection = mysql.createConnection(param);
 var sessionStore = new MySQLStore(
   {
     expiration: 10800000,
@@ -223,7 +217,13 @@ app.post("/delete", auth, (req, res) => {
 
 
 app.get("/id",  (req, res) => {
-    return res.send({isAutenticated:true});
+    var connection = mysql.createConnection(param);
+  const sql = "select * from widget.users where id=4";
+  connection.query(sql, function (error, result, fields) {
+    if(error) return res.send(error);
+    return res.send(result);
+  });
+  connection.end();
 });
 
 
