@@ -78,9 +78,9 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 var param = {
-  host: "localhost",
-  user: "client",
-  password: "12345678",
+  socketPath: "/var/run/mysqld/mysqld.sock",
+  user: "root",
+  password: "nicklzx",
   database: "widget",
 };
 var sesParams = {
@@ -90,7 +90,7 @@ var sesParams = {
   database: "widget",
 };
 
-var sessionConnection = mysql.createConnection(sesParams);
+var sessionConnection = mysql.createConnection(param);
 var sessionStore = new MySQLStore(
   {
     expiration: 10800000,
