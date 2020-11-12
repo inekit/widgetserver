@@ -228,7 +228,7 @@ app.post("/delete", auth, (req, res) => {
 
 
 app.get("/id",  (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', 'http://81.176.228.81:8080');
 res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
     return res.send({isAutenticated:true});
 });
