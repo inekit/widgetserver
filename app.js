@@ -155,7 +155,7 @@ res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
         return next(err);
       }
       console.log(1)
-      return res.send(JSON.stringify({isAutenticated:true}));
+      return res.send(JSON.stringify(user));
       
     });
   })(req, res, next);
