@@ -228,7 +228,8 @@ app.post("/delete", auth, (req, res) => {
 
 
 app.get("/id",  (req, res) => {
-  res.Headers.Append("set-cookie", "id=1; path=/; SameSite=None; Secure");
+  res.setHeader('Access-Control-Allow-Origin', '*');
+res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
     return res.send({isAutenticated:true});
 });
 
