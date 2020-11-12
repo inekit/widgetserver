@@ -20,7 +20,7 @@ const { json } = require("body-parser");
 
 app.use(
   cors({
-    origin: ["http://localhost:8080","http://81.176.228.81:8080"],
+    //origin: ["http://localhost:8080","http://81.176.228.81:8080"],
     credentials: true,
   })
 );
