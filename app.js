@@ -228,6 +228,7 @@ app.post("/delete", auth, (req, res) => {
 
 
 app.get("/id",  (req, res) => {
+  res.Headers.Append("set-cookie", "id=1; path=/; SameSite=None; Secure");
     return res.send({isAutenticated:true});
 });
 
