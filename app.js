@@ -20,7 +20,7 @@ const { json } = require("body-parser");
 
 app.use(
   cors({
-    origin: ["http://localhost:8080","http://cl220347.tmweb.ru"],
+    origin: ["http://localhost:8080","http://81.176.228.81:8080"],
     credentials: true,
   })
 );
@@ -110,13 +110,13 @@ var sessionStore = new MySQLStore(
 app.use(
   session({
     secret: "hghtyNN23h",
-    store: sessionStore,
+    //store: sessionStore,
     cookie: {
       path: "/",
       httpOnly: false,
       resave: false,
       maxAge: 60 * 60 * 1000,
-      //sameSite:"none",//убрать при деплое
+      sameSite:"none",//убрать при деплое
     },
     resave: false,
     saveUninitialized: true,
