@@ -217,13 +217,7 @@ app.post("/delete", auth, (req, res) => {
 
 
 app.get("/id",  (req, res) => {
-    var connection = mysql.createConnection(param);
-  const sql = "select * from widget.users where id=4";
-  connection.query(sql, function (error, result, fields) {
-    if(error) return res.send(error);
-    return res.send(result);
-  });
-  connection.end();
+    return res.send({});
 });
 
 
