@@ -1,4 +1,3 @@
-
 const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
@@ -73,13 +72,19 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 var param = {
-  socketPath: "/var/run/mysqld/mysqld.sock",
-  user: "root",
-  password: "nicklzx",
+  host: "localhost",
+  user: "client",
+  password: "12345678",
+  database: "widget",
+};
+var sesParams = {
+  host: "localhost",
+  user: "sessions",
+  password: "1234",
   database: "widget",
 };
 
-var sessionConnection = mysql.createConnection(param);
+var sessionConnection = mysql.createConnection(sesParams);
 var sessionStore = new MySQLStore(
   {
     expiration: 10800000,
@@ -217,7 +222,7 @@ app.post("/delete", auth, (req, res) => {
 
 
 app.get("/id",  (req, res) => {
-    return res.send({});
+    return res.send({isAutenticated:true});
 });
 
 
