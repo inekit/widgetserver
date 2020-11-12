@@ -1,3 +1,4 @@
+
 const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
@@ -244,4 +245,10 @@ app.get("/logout", auth, (req, res) => {
 });
 
 //app.listen(port, () => console.log(`Example app listening on port ${port}!`));
-let srv = http.createServer(app).listen(51082);
+let srv = http.createServer(app).listen(8000);
+
+var path=require('path');
+
+express().use(express.static(
+  path.join(__dirname,'webb')
+)).listen(8080);
