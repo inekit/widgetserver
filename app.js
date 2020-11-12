@@ -18,7 +18,12 @@ var webs = http.createServer(function (req, res) {
 const CryptoJS=require("crypto-js");
 const { json } = require("body-parser");
 
-
+app.use(
+  cors({
+    origin: ["http://localhost:8080","http://81.176.228.81:8080"],
+    credentials: true,
+  })
+);
 
 passport.serializeUser(function (user, done) {
   console.log("Сериализация: ", user);
