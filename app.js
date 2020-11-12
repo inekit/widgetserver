@@ -139,6 +139,8 @@ const auth = (req, res, next) => {
 };
 
 app.post("/login", (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://81.176.228.81:8080');
+res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
   console.log(req.body);
   passport.authenticate("local", function (err, user) {
     if (err) {
@@ -160,6 +162,8 @@ app.post("/login", (req, res, next) => {
 });
 
 app.post("/register", (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://81.176.228.81:8080');
+res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
   if (!req.body.password || !req.body.nick || !req.body.email) {
     res.send({error:"no data"});
   } else {
@@ -180,6 +184,8 @@ app.post("/register", (req, res) => {
 });
 
 app.get("/widgets", auth, (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://81.176.228.81:8080');
+res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
   var connection = mysql.createConnection(param);
   idd = req.session.passport.user.toString();
   const sql = "select w.id,platform,type,text,discription,w.name,w.phone,message  FROM widget.users u,widget.widgets w where u.id=w.client_id and u.id=?;";
