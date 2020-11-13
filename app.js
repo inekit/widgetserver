@@ -60,8 +60,15 @@ passport.use(
   ) {
     Connect();
     console.log(email + password);
-        return done(null, {id:4,email:"i@gmail.com",nick:"inekit"});
-      
+    for (let u in users) {
+      if (
+        email === users[u].email &&
+        bcrypt.compareSync(password, users[u].password)
+      ) {
+        console.log("логин правильный, вы ", users[u].id);
+        return done(null, users[u]);
+      }
+    }
     
     console.log("логин неправильный");
     return done(null, false);
@@ -224,13 +231,11 @@ app.post("/delete", auth, (req, res) => {
 
 
 app.get("/id", auth, (req, res) => {
-  var randomNumber=Math.random().toString();
-    randomNumber=randomNumber.substring(2,randomNumber.length);
-    res.cookie('cookieName',randomNumber, { maxAge: 900000, httpOnly: true });
-    console.log('cookie created successfully');
-var connection = mysql.createConnection(param);
-    const sql = "select id,nick from widget.users where id=4 limit 1";
-  connection.query(sql,  function (error, result, fields) {
+  var connection = mysql.createConnection(param);
+  idd = req.session.passport.user.toString();
+  const dialog = [idd];
+  const sql = "select id,nick from widget.users where id=(?) limit 1";
+  connection.query(sql, dialog, function (error, result, fields) {
     return res.send(result);
   });
   connection.end();
