@@ -61,11 +61,6 @@ passport.use(
     Connect();
     console.log(email + password);
     for (const userN of users) {
-      if (
-        email === userN.email &&
-        bcrypt.compareSync(password, userN.password)
-      ) {
-        console.log("логин правильный, вы ", userN.id);
         return done(null, userN);
       }
     }
@@ -140,8 +135,6 @@ const auth = (req, res, next) => {
 };
 
 app.post("/login", (req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://81.176.228.81:8080');
-res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
   console.log(req.body);
   passport.authenticate("local", function (err, user) {
     if (err) {
@@ -163,8 +156,6 @@ res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
 });
 
 app.post("/register", (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://81.176.228.81:8080');
-res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
   if (!req.body.password || !req.body.nick || !req.body.email) {
     res.send({error:"no data"});
   } else {
