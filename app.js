@@ -180,11 +180,9 @@ app.post("/register", (req, res) => {
 });
 
 app.get("/widgets", auth, (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://81.176.228.81:8080');
-res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
   var connection = mysql.createConnection(param);
   idd = req.session.passport.user.toString();
-  const sql = "select w.id,platform,type,text,discription,w.name,w.phone,message  FROM widget.users u,widget.widgets w where u.id=w.client_id and u.id=?;";
+  const sql = "select w.id,platform,type,text,description,w.name,w.phone,message  FROM widget.users u,widget.widgets w where u.id=w.client_id and u.id=?;";
   connection.query(sql,idd, function (error, result, fields) {
     for (i in result){
       result[i].key=CryptoJS.AES.encrypt(result[i].id.toString(), 'bhaerbalntrzv').toString();
@@ -201,7 +199,7 @@ res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
 app.post("/addwidget", auth, (req, res) => {
   var connection = mysql.createConnection(param);
   idd = req.session.passport.user.toString();
-  const sql = "INSERT INTO `widget`.`widgets` (`client_id`, `platform`, `type`, `text`, `discription`, `name`,`phone`, `message`) VALUES (?, ?, ?, ?, ?,?,?,?)";
+  const sql = "INSERT INTO `widget`.`widgets` (`client_id`, `platform`, `type`, `text`, `description`, `name`,`phone`, `message`) VALUES (?, ?, ?, ?, ?,?,?,?)";
   connection.query(sql,[idd,req.body.platform,req.body.visual,req.body.text,req.body.description,req.body.name,req.body.phone,req.body.message], function (error, result, fields) {
     return res.send(result);
   });
@@ -211,7 +209,7 @@ app.post("/addwidget", auth, (req, res) => {
 app.post("/alter", auth, (req, res) => {
   var connection = mysql.createConnection(param);
   idd = req.session.passport.user.toString();
-  const sql = "UPDATE widget.widgets SET platform = ? , type = ?, text = ?,discription = ?,name = ?,phone = ?,message = ? WHERE id=? and client_id=?;";
+  const sql = "UPDATE widget.widgets SET platform = ? , type = ?, text = ?,description = ?,name = ?,phone = ?,message = ? WHERE id=? and client_id=?;";
   connection.query(sql,[req.body.platform,req.body.visual,req.body.text,req.body.description,req.body.name,req.body.phone,req.body.message,req.body.id,idd], function (error, result, fields) {
     return res.send(result);
   });
