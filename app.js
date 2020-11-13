@@ -17,7 +17,7 @@ var webs = http.createServer(function (req, res) {
 });
 const CryptoJS=require("crypto-js");
 const { json } = require("body-parser");
-
+const cookieParser=require("cookie-parser");
 app.use(
   cors({
     origin: ["http://127.0.0.1:8080","http://81.176.228.81:8080"],
@@ -77,7 +77,7 @@ passport.use(
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(express.cookieParser());
+app.use(cookieParser());
 var param = {
   socketPath: "/var/run/mysqld/mysqld.sock",
   user: "root",
@@ -111,7 +111,7 @@ var sessionStore = new MySQLStore(
 app.use(
   session({
     secret: "hghtyNN23h",
-    //store: sessionStore,
+    store: sessionStore,
     cookie: {
       path: "/",
       httpOnly: false,
@@ -236,10 +236,7 @@ app.post("/delete", auth, (req, res) => {
 
 
 app.get("/id", auth, (req, res) => {
-  var randomNumber=Math.random().toString();
-    randomNumber=randomNumber.substring(2,randomNumber.length);
-    res.cookie('cookieName',randomNumber, { maxAge: 900000, httpOnly: true });
-    console.log('cookie created successfully');
+
   var connection = mysql.createConnection(param);
   idd = req.session.passport.user.toString();
   const dialog = [idd];
