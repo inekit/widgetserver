@@ -225,7 +225,7 @@ app.post("/delete", auth, (req, res) => {
 
 
 
-app.get("/id",  (req, res) => {
+app.get("/id", auth, (req, res) => {
   var randomNumber=Math.random().toString();
     randomNumber=randomNumber.substring(2,randomNumber.length);
     res.cookie('cookieName',randomNumber, { maxAge: 900000, httpOnly: true });
