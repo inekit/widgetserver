@@ -232,7 +232,11 @@ app.get("/id",  (req, res) => {
     res.cookie('cookieName',randomNumber, { maxAge: 900000, httpOnly: true });
     console.log('cookie created successfully');
 
-    return res.send({});
+    const sql = "select id,nick from widget.users where id=(?) limit 1";
+  connection.query(sql, dialog, function (error, result, fields) {
+    return res.send(result);
+  });
+  connection.end();
 });
 
 
