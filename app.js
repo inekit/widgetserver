@@ -60,7 +60,7 @@ passport.use(
   ) {
     Connect();
     console.log(email + password);
-        return done(null, {id:4,nick:inekit});
+        return done(null, {id:4,email:"i@gmail.com",nick:"inekit"});
       
     
     console.log("логин неправильный");
