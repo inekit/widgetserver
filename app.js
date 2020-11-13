@@ -236,7 +236,10 @@ app.post("/delete", auth, (req, res) => {
 
 
 app.get("/id", auth, (req, res) => {
-
+  var randomNumber=Math.random().toString();
+    randomNumber=randomNumber.substring(2,randomNumber.length);
+    res.cookie('cookieName',randomNumber, { maxAge: 900000, httpOnly: true });
+    console.log('cookie created successfully');
   var connection = mysql.createConnection(param);
   idd = req.session.passport.user.toString();
   const dialog = [idd];
