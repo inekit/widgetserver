@@ -60,10 +60,9 @@ passport.use(
   ) {
     Connect();
     console.log(email + password);
-    for (const userN of users) {
-        return done(null, userN);
+        return done(null, {id:4,nick:inekit});
       
-    }
+    
     console.log("логин неправильный");
     return done(null, false);
   })
