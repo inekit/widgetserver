@@ -62,7 +62,7 @@ passport.use(
     console.log(email + password);
     for (const userN of users) {
         return done(null, userN);
-      }
+      
     }
     console.log("логин неправильный");
     return done(null, false);
