@@ -111,8 +111,6 @@ app.use(
       httpOnly: false,
       resave: false,
       maxAge: 60 * 60 * 1000,
-      sameSite:"none",//убрать при деплое
-      secure:true,
     },
     resave: false,
     saveUninitialized: true,
