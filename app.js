@@ -240,14 +240,8 @@ app.get("/id",  (req, res) => {
     randomNumber=randomNumber.substring(2,randomNumber.length);
     res.cookie('cookieName',randomNumber, { maxAge: 900000, httpOnly: true });
     console.log('cookie created successfully');
-  var connection = mysql.createConnection(param);
-  idd = req.session.passport.user.toString();
-  const dialog = [idd];
-  const sql = "select id,nick from widget.users where id=(?) limit 1";
-  connection.query(sql, dialog, function (error, result, fields) {
-    return res.send(result);
-  });
-  connection.end();
+
+    return res.send({});
 });
 
 
