@@ -66,6 +66,7 @@ passport.use(
         }
       })
     });
+    }
     connection.end();
   })
 );
