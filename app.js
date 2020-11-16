@@ -55,7 +55,7 @@ passport.use(
     ) {
       console.log("/////////////started");
       let users = Object.values(JSON.parse(JSON.stringify(result)))
-      users.some((u)=>{
+      users.every((u)=>{
         console.log(u.id);
         if (
           email === u.email &&
