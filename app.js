@@ -42,7 +42,7 @@ passport.deserializeUser(function (id, done) {
       let users = Object.values(JSON.parse(JSON.stringify(result)))
       return done(null,users.find((u)=>{
         console.log(u.id);
-        u.id === id ? return u;
+        if (u.id === id) return u;
       }))
     });
 });
