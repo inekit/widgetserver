@@ -2,16 +2,23 @@ main {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 73px);
 }
 
 .sidebar {
+  flex: 1;
+  min-width: 200px;
+  max-width: 300px;
+  overflow: auto;
+}
+
+.widgets {
   flex: 1;
   overflow: auto;
 }
 
 .editor {
-  flex: 2;
+  flex: 1;
   overflow: auto;
 }
 
