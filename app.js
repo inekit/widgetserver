@@ -32,11 +32,19 @@ passport.serializeUser(function (user, done) {
 
 passport.deserializeUser(function (id, done) {
   console.log("Десериализация: ", id);
-  var user = false;
-  for (const userN of users) {
-    user = userN.id === id ? userN : user;
-  }
-  done(null, user);
+  const connection = mysql.createConnection(param);
+    connection.query("SELECT * FROM widget.users", function (
+      error,
+      result,
+      fields
+    ) {
+      console.log("/////////////deser);
+      let users = Object.values(JSON.parse(JSON.stringify(result)))
+      return done(null,users.find((u)=>{
+        console.log(u.id);
+        u.id === id ? return u;
+      }))
+    });
 });
 
 
@@ -47,7 +55,7 @@ passport.use(
     password,
     done
   ) {
-     var connection = mysql.createConnection(param);
+     const connection = mysql.createConnection(param);
     connection.query("SELECT * FROM widget.users", function (
       error,
       result,
@@ -62,12 +70,11 @@ passport.use(
           bcrypt.compareSync(password, u.password)
         ) {
           console.log("логин правильный, вы ", u.id);
+          connection.end();
           return u;
         }
       }))
     });
-    
-    connection.end();
   })
 );
 
