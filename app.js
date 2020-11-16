@@ -40,18 +40,6 @@ passport.deserializeUser(function (id, done) {
 });
 
 
-function Connect() {
-  var connection = mysql.createConnection(param);
-  connection.query("SELECT * FROM widget.users", function (
-    error,
-    result,
-    fields
-  ) {
-    //console.log(result)
-    users = result;
-  });
-  connection.end();
-}
 
 passport.use(
   new LocalStrategy({ usernameField: "email" }, function (
@@ -59,7 +47,16 @@ passport.use(
     password,
     done
   ) {
-    Connect();
+     var connection = mysql.createConnection(param);
+    connection.query("SELECT * FROM widget.users", function (
+      error,
+      result,
+      fields
+    ) {
+      //console.log(result)
+      users = result;
+    });
+    connection.end();
     console.log(email + password);
     for (let u in users) {
       if (
