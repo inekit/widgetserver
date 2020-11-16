@@ -54,18 +54,16 @@ passport.use(
       fields
     ) {
       console.log(email + password);
-      
-      let r=JSON.parse(JSON.stringify(result))
-      console.log(r)
-      console.log(r)
-      for (let u in r) {
-        console.log(r[u].email+"bnthhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
-      if (
-        email === r[u].email &&
-        bcrypt.compareSync(password, r[u].password)
-      ) {
-        console.log("логин правильный, вы ", r[u].id);
-        return done(null, r[u]);
+      let u=[];
+      u=result;
+      for (let u in users) {
+        if (
+          email === users[u].email &&
+          bcrypt.compareSync(password, users[u].password)
+        ) {
+          console.log("логин правильный, вы ", users[u].id);
+          return done(null, users[u]);
+        }
       }
     }
 
