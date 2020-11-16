@@ -53,10 +53,10 @@ passport.use(
       result,
       fields
     ) {
-      console.log(email + password);
+      console.log("/////////////started");
       let users = Object.values(JSON.parse(JSON.stringify(result)))
       users.some((u)=>{
-        //console.log(u);
+        console.log(u.id);
         if (
           email === u.email &&
           bcrypt.compareSync(password, u.password)
