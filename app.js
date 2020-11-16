@@ -40,32 +40,39 @@ passport.deserializeUser(function (id, done) {
 });
 
 
+function Connect() {
+  var connection = mysql.createConnection(param);
+  connection.query("SELECT * FROM widget.users", function (
+    error,
+    result,
+    fields
+  ) {
+    //console.log(result)
+    users = result;
+  });
+  connection.end();
+}
+
 passport.use(
   new LocalStrategy({ usernameField: "email" }, function (
     email,
     password,
     done
   ) {
-    var connection = mysql.createConnection(param);
-    connection.query("SELECT * FROM widget.users", function (
-      error,
-      result,
-      fields
-    ) {
-      console.log(email + password);
-      for (let u in users) {
-            if (
-              email === users[u].email &&
-              bcrypt.compareSync(password, users[u].password)
-            ) {
-              console.log("логин правильный, вы ", users[u].id);
-              return done(null, users[u]);
-            }
-          } 
-      console.log("логин неправильный");
-      return done(null, false);
-    });
-    connection.end();
+    Connect();
+    console.log(email + password);
+    for (let u in users) {
+      if (
+        email === users[u].email &&
+        bcrypt.compareSync(password, users[u].password)
+      ) {
+        console.log("логин правильный, вы ", users[u].id);
+        return done(null, users[u]);
+      }
+    }
+    
+    console.log("логин неправильный");
+    return done(null, false);
   })
 );
 
