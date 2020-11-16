@@ -59,20 +59,26 @@ passport.use(
     password,
     done
   ) {
-    Connect();
-    console.log(email + password);
-    for (let u in users) {
-      if (
-        email === users[u].email &&
-        bcrypt.compareSync(password, users[u].password)
+      var connection = mysql.createConnection(param);
+      connection.query("SELECT * FROM widget.users", function (
+        error,
+        result,
+        fields
       ) {
-        console.log("логин правильный, вы ", users[u].id);
-        return done(null, users[u]);
-      }
-    }
-    
-    console.log("логин неправильный");
-    return done(null, false);
+        console.log(email + password);
+        for (let u in result) {
+          if (
+            email === result[u].email &&
+            bcrypt.compareSync(password, result[u].password)
+          ) {
+            console.log("логин правильный, вы ", result[u].id);
+            return done(null, result[u]);
+          }
+        }
+
+        console.log("логин неправильный");
+        return done(null, false);
+      })
   })
 );
 
