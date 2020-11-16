@@ -65,7 +65,7 @@ passport.use(
           return done(null, users[u]);
         }
       }
-    }
+    
 
       console.log("логин неправильный");
       return done(null, false);
