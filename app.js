@@ -64,9 +64,9 @@ passport.use(
           console.log("логин правильный, вы ", u.id);
           return u;
         }
-      })
+      }))
     });
-    }
+    
     connection.end();
   })
 );
