@@ -59,7 +59,7 @@ passport.use(
       console.log(r)
       console.log(r)
       for (let u in r) {
-        console.log(r[u]+"bnthhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        console.log(u+"bnthhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
       if (
         email === r[u].email &&
         bcrypt.compareSync(password, r[u].password)
