@@ -53,23 +53,23 @@ passport.use(
       result,
       fields
     ) {
-      //console.log(result)
-      users = result;
+      console.log(result)
+    
+      console.log(email + password);
+      for (let u in result) {
+        if (
+          email === result[u].email &&
+          bcrypt.compareSync(password, result[u].password)
+        ) {
+          console.log("логин правильный, вы ", result[u].id);
+          return done(null, result[u]);
+        }
+      }
+
+      console.log("логин неправильный");
+      return done(null, false);
     });
     connection.end();
-    console.log(email + password);
-    for (let u in users) {
-      if (
-        email === users[u].email &&
-        bcrypt.compareSync(password, users[u].password)
-      ) {
-        console.log("логин правильный, вы ", users[u].id);
-        return done(null, users[u]);
-      }
-    }
-    
-    console.log("логин неправильный");
-    return done(null, false);
   })
 );
 
