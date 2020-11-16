@@ -54,7 +54,7 @@ passport.use(
       fields
     ) {
       console.log(email + password);
-      let users = Object.values(JSON.parse(JSON.stringify(rows)))
+      let users = Object.values(JSON.parse(JSON.stringify(result)))
       users.forEach((u)=>{
         console.log(u);
         if (
