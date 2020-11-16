@@ -53,7 +53,7 @@ passport.use(
       result,
       fields
     ) {
-    
+      console.log(JSON.parse(JSON.stringify(result));
       console.log(email + password);
       for (let u in result) {
         console.log(result[u].email)
