@@ -246,7 +246,7 @@ app.post("/addwidget", auth, (req, res) => {
               //throw err;
             });
           }
-          return //res.send({isAffected:true})
+          return res.send({isAffected:true})
         });
       };
     });
