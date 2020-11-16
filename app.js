@@ -225,25 +225,24 @@ app.post("/addwidget", auth, (req, res) => {
     connection.query(iWQuery, [idd,widget.name,widget.header,widget.description,widget.b_color,widget.position_desktop,widget.position_mobile,widget.prototype_name], (error, result, fields)=> {
       console.log(result.insertId);
       if (error) {
-        return connection.rollback(function() {
-          console.log(error)
-          throw error;
-        });
+        connection.rollback(function() {
+              return res.send({isAffected:false})
+            });
       }
       for(o of req.body.operators) {
         connection.query(iOQuery, [result.insertId,o.name,o.phone,o.platform_name,o.message,result.insertId,idd], (error, result, fields) =>{
           console.log(result);
           if (error) {
-            return connection.rollback(function() {
-              //throw error;
+            connection.rollback(function() {
+              return res.send({isAffected:false})
             });
           }
       });    
       
         connection.commit(function(err) {
           if (err) {
-            return connection.rollback(function() {
-              //throw err;
+            connection.rollback(function() {
+              return res.send({isAffected:false})
             });
           }
           return res.send({isAffected:true})
