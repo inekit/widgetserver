@@ -55,22 +55,16 @@ passport.use(
     ) {
       console.log("/////////////started");
       let users = Object.values(JSON.parse(JSON.stringify(result)))
-      users.every((u)=>{
+      return done(null,users.every((u)=>{
         console.log(u.id);
         if (
           email === u.email &&
           bcrypt.compareSync(password, u.password)
         ) {
           console.log("логин правильный, вы ", u.id);
-          return done(null, u);
+          return u;
         }
       })
-        
-      
-    
-
-      console.log("логин неправильный");
-      return done(null, false);
     });
     connection.end();
   })
