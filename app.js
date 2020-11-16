@@ -38,7 +38,7 @@ passport.deserializeUser(function (id, done) {
       result,
       fields
     ) {
-      console.log("/////////////deser);
+      console.log("/////////////deser");
       let users = Object.values(JSON.parse(JSON.stringify(result)))
       return done(null,users.find((u)=>{
         console.log(u.id);
