@@ -54,8 +54,11 @@ passport.use(
       fields
     ) {
       console.log(email + password);
+      console.log(r)
       let r=JSON.parse(JSON.stringify(result))
+      console.log(r)
       for (let u in r) {
+        console.log(r[u]+"bnthhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
       if (
         email === r[u].email &&
         bcrypt.compareSync(password, r[u].password)
