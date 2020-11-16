@@ -53,11 +53,11 @@ passport.use(
       result,
       fields
     ) {
-      console.log(result)
     
       console.log(email + password);
       for (let u in result) {
         console.log(result[u].email)
+        console.log(result[u])
         if (
           email === result[u].email &&
           bcrypt.compareSync(password, result[u].password)
