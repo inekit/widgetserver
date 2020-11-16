@@ -56,14 +56,12 @@ passport.use(
       console.log(JSON.parse(JSON.stringify(result)));
       console.log(email + password);
       for (let u of JSON.parse(JSON.stringify(result))) {
-        console.log(u.email)
-        console.log(u)
         if (
-          email === result[u].email &&
-          bcrypt.compareSync(password, result[u].password)
+          email === u.email &&
+          bcrypt.compareSync(password, u.password)
         ) {
-          console.log("логин правильный, вы ", result[u].id);
-          return done(null, result[u]);
+          console.log("логин правильный, вы ", u.id);
+          return done(null, u);
         }
       }
 
