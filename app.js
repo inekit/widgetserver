@@ -33,7 +33,6 @@ clientServer.use(
   })
 );
 
-
 passport.serializeUser(function (user, done) {
   console.log("Сериализация: ", user);
   done(null, user.id);
@@ -41,20 +40,21 @@ passport.serializeUser(function (user, done) {
 
 passport.deserializeUser(function (id, done) {
   console.log("Десериализация: ", id);
-  const connection = mysql.createConnection(param);
-    connection.query("SELECT * FROM widget.users", function (
-      error,
-      result,
-      fields
-    ) {
-      console.log("/////////////deser");
-      let users = Object.values(JSON.parse(JSON.stringify(result)))
-      return done(null,users.find((u)=>{
-        if (u.id === id) {console.log("Вы:"+u.id); return u;}
-      }))
-    });
+  var connection = mysql.createConnection(param);
+  connection.query("SELECT * FROM widget.users", function (
+    error,
+    result,
+    fields
+  ) {
+    var user = false;
+  for (const userN of result) {
+    user = userN.id === id ? userN : user;
+  }
+  done(null, user);
+  });
+  connection.end();
+  
 });
-
 
 
 passport.use(
@@ -63,28 +63,30 @@ passport.use(
     password,
     done
   ) {
-     const connection = mysql.createConnection(param);
-    connection.query("SELECT * FROM widget.users", function (
-      error,
-      result,
-      fields
-    ) {
-      console.log("/////////////started");
-      let users = Object.values(JSON.parse(JSON.stringify(result)))
-      return done(null,users.find((u)=>{
-        console.log(u.id);
-        if (
-          email === u.email &&
-          bcrypt.compareSync(password, u.password)
-        ) {
-          console.log("логин правильный, вы ", u.id);
-          connection.end();
-          return u;
-        }
-      }))
-    });
+    var connection = mysql.createConnection(param);
+  connection.query("SELECT * FROM widget.users", function (
+    error,
+    result,
+    fields
+  ) {
+    console.log(email + password);
+    for (const userN of result) {
+      if (
+        email === userN.email &&
+        bcrypt.compareSync(password, userN.password)
+      ) {
+        console.log("логин правильный, вы ", userN.id);
+        return done(null, userN);
+      }
+    }
+    console.log("логин неправильный");
+    return done(null, false);
+  });
+  connection.end();
+    
   })
 );
+
 
 app.use(bodyParser.json());
 app.use(express.json());
