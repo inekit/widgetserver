@@ -96,8 +96,8 @@ clientServer.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 var param = {
   socketPath: "/var/run/mysqld/mysqld.sock",
-  user: "root",
-  password: "nicklzx",
+  user: "root1",
+  password: "nicklzxnicklzx",
   database: "widget",
 };
 var sesParams = {
