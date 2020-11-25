@@ -5,6 +5,7 @@ const passport = require("passport");
 const mysql = require("mysql");
 const MySQLStore = require("express-mysql-session")(session);
 const app = express();
+const clientServer = express();
 const cors = require("cors");
 const http = require("http");
 const LocalStrategy = require("passport-local").Strategy;
@@ -24,6 +25,14 @@ app.use(
     credentials: true,
   })
 );
+
+clientServer.use(
+  cors({
+    origin: "*",
+    credentials: true,
+  })
+);
+
 
 passport.serializeUser(function (user, done) {
   console.log("Сериализация: ", user);
@@ -80,6 +89,10 @@ passport.use(
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+clientServer.use(bodyParser.json());
+clientServer.use(express.json());
+clientServer.use(express.urlencoded({ extended: false }));
+
 app.use(cookieParser());
 var param = {
   socketPath: "/var/run/mysqld/mysqld.sock",
@@ -140,6 +153,7 @@ const auth = (req, res, next) => {
   }
 };
 
+
 app.post("/login", (req, res, next) => {
   console.log(req.body);
   passport.authenticate("local", function (err, user) {
@@ -181,7 +195,6 @@ app.post("/register", (req, res) => {
   }
 });
 
-
 app.get("/widgets", auth, (req, res) => {
   var connection = mysql.createConnection(param);
   idd = req.session.passport.user.toString();
@@ -214,43 +227,63 @@ app.post("/operators", auth, (req, res) => {
 
 
 app.post("/addwidget", auth, (req, res) => {
+  let regl40=/^[a-zA-ZА-Яа-я0-9\s]{1,40}$/;
+  let regl10=/^[a-zA-ZА-Яа-я0-9\s]{1,10}$/
   let widget=req.body.widget;
-  idd = req.session.passport.user.toString();
-  const iWQuery = "insert into widget.widgets(creator_id,name,header,description,b_color,position_desktop,position_mobile,prototype_name) values (?,?,?,?,?,?,?,?)";
-  const iOQuery="insert into widget.operators (widget_id,name,phone,platform_name,message)\
-  select ?,?,?,?,? from widget.widgets w,widget.users u \
-  where  w.creator_id=u.id  and w.id=? and u.id=? limit 1";
-  const connection = mysql.createConnection(param)
-  connection.beginTransaction(function(err) {
-    if (err) { throw err; }
-    connection.query(iWQuery, [idd,widget.name,widget.header,widget.description,widget.b_color,widget.position_desktop,widget.position_mobile,widget.prototype_name], (error, result, fields)=> {
-      console.log(result.insertId);
-      if (error) {
-        connection.rollback(function() {
-              return res.send({isAffected:false})
-            });
-      }
-      for(o of req.body.operators) {
-        connection.query(iOQuery, [result.insertId,o.name,o.phone,o.platform_name,o.message,result.insertId,idd], (error, result, fields) =>{
-          console.log(result);
-          if (error) {
-            connection.rollback(function() {
-              return res.send({isAffected:false})
-            });
-          }
-      });    
-      
+  if(idd,regl40.test(widget.name),regl10.test(widget.header),
+  /^#[0-9a-fA-F]{6}$/.test(widget.b_color),/^[rl][tb]$/.test(widget.position_desktop)
+  ,/^[rl][tb]$/.test(widget.position_mobile))
+  {
+
+    
+    idd = req.session.passport.user.toString();
+    const iWQuery = "insert into widget.widgets(creator_id,name,header,description,b_color,position_desktop,position_mobile,prototype_name) values (?,?,?,?,?,?,?,?)";
+    const iOQuery="insert into widget.operators (widget_id,name,phone,platform_name,message)\
+    select ?,?,?,?,? from widget.widgets w,widget.users u \
+    where  w.creator_id=u.id  and w.id=? and u.id=? limit 1";
+    const connection = mysql.createConnection(param)
+    connection.beginTransaction(function(err) {
+      if (err) { throw err; }
+      connection.query(iWQuery, [idd,widget.name,widget.header,widget.description,widget.b_color,widget.position_desktop,widget.position_mobile,widget.prototype_name], (error, result, fields)=> {
+        //console.log(result.insertId);
+        if (error) {
+          return connection.rollback(function() {
+            console.log(error)
+            connection.end();
+            throw error;
+          });
+        }
+        for(o of req.body.operators) {
+          if(idd,regl40.test(o.name),regl40.test(o.message),
+          /^(\+?)([0-9-()] ?){9,20}$/.test(o.phone))
+          {
+            connection.query(iOQuery, [result.insertId,o.name,o.phone,o.platform_name,o.message,result.insertId,idd], (error, result, fields) =>{
+              console.log(result);
+              if (error) {
+                return connection.rollback(function() {
+                  res.send({isAffected:false})
+                  connection.end();
+                });
+              }
+          });   
+          } else {return connection.rollback(()=>{res.send({isAffected:false}); connection.end();});}
+          
+        };
         connection.commit(function(err) {
           if (err) {
-            connection.rollback(function() {
-              return res.send({isAffected:false})
+            return connection.rollback(function() {
+              res.send({isAffected:false})
+              connection.end();
             });
           }
-          return res.send({isAffected:true})
+          res.send({isAffected:true})
+          return connection.end();
         });
-      };
+        
+      });
     });
-  });
+    
+  }
   
 });
 
@@ -322,7 +355,7 @@ app.get("/sub", auth, (req, res) => {
   var connection = mysql.createConnection(param);
   idd = req.session.passport.user.toString();
   const dialog = [idd];
-  const sql = "SELECT u.id,s.plan_name,DATE_ADD(s.date_start, INTERVAL p.period MONTH) date_finish FROM widget.subscriptions s,widget.users u,widget.plans p  where u.id=s.user_id and p.name=s.plan_name and u.id=? order by date_start limit 1";
+  const sql = "SELECT u.id,s.plan_name,DATE_ADD(s.date_start, INTERVAL p.period MONTH) date_finish FROM widget.subscriptions s,widget.users u,widget.plans p  where u.id=s.user_id and p.name=s.plan_name and u.id=? order by date_start desc limit 1";
   connection.query(sql, dialog, function (error, result, fields) {
     return res.send(result);
   });
@@ -335,7 +368,7 @@ app.post("/addsub", auth, (req, res) => {
   const sql = "insert into widget.subscriptions \
   (SELECT ?,?,now(),?, ? FROM widget.subscriptions s,widget.users u,widget.plans p \
   where u.id=s.user_id and p.name=s.plan_name and u.id=? and DATE_ADD(s.date_start, INTERVAL p.period MONTH)<now() \
-  order by date_start limit 1) \
+  order by date_start desc limit 1) \
   union \
   (select ?,?,now(),?, ? from widget.subscriptions \
   where (SELECT count(id) FROM widget.subscriptions s,widget.users u where u.id=s.user_id and user_id=?)=0 limit 1)";
@@ -346,15 +379,53 @@ app.post("/addsub", auth, (req, res) => {
   connection.end();
 });
 
-app.post("/stat-by-cities", auth, (req, res) => {
+app.post("/prolongsub", auth, (req, res) => {
   var connection = mysql.createConnection(param);
   idd = req.session.passport.user.toString();
-  const sql = "SELECT id,city_name,date FROM widget.clicks c where line_id=?";
-  connection.query(sql, [idd,req.body.o_id], function (error, result, fields) {
+  const sql = "insert into widget.subscriptions \
+  (SELECT ?,?,DATE_ADD(s.date_start, INTERVAL p.period MONTH),?, ? FROM widget.subscriptions s,widget.users u,widget.plans p \
+  where u.id=s.user_id and p.name=s.plan_name and u.id=? and DATE_ADD(s.date_start, INTERVAL p.period MONTH)>now() \
+  order by date_start desc limit 1)";
+  connection.query(sql, [idd,req.body.plan_name,req.body.coupon_name,"Чек",idd], 
+  function (error, result, fields) {
     return res.send(result);
   });
   connection.end();
 });
+
+
+app.post("/stat-by-cities", auth, (req, res) => {
+  var connection = mysql.createConnection(param);
+  idd = req.session.passport.user.toString();
+  let a=1;
+  const sql = "SELECT c.city_name city,count(c.id) count FROM widget.clicks c, widget.operators o, widget.widgets w,widget.users u \
+  where u.id=w.creator_id and w.id=o.widget_id and c.line_id=o.id and u.id=? and w.id=?\
+  group by c.city_name";
+  const sql2 = "SELECT o.id,count(c.id) count,DATE(c.date) date FROM widget.clicks c, widget.operators o, widget.widgets w,widget.users u \
+  where u.id=w.creator_id and w.id=o.widget_id and c.line_id=o.id and u.id=? and w.id=? and DATE(c.date)>=DATE(?) and DATE(c.date)<=DATE(?)\
+  group by o.id,DATE(c.date)";
+  let ex={};
+  connection.query(sql, [idd,req.body.widget_id], function (error, ress, fields) {
+    ex={cdata:ress};
+  });
+  console.log(ex)
+  connection.query(sql2, [idd,req.body.widget_id,req.body.ds,req.body.df], function (error, result, fields) {
+    
+    let res2={};
+    result.forEach(element => {
+      if(res2[element.id]===undefined)  res2[element.id]={data:[],label:element.id}; 
+      res2[element.id].data.push(element.count)
+    });
+
+    ex.ddata=res2;
+    
+    res.send(ex);
+    return connection.end();
+  });
+  
+});
+
+
 
 app.get("/plans",  (req, res) => {
   var connection = mysql.createConnection(param);
@@ -371,7 +442,15 @@ app.get("/logout", auth, (req, res) => {
   return res.send(JSON.stringify({isAuthenticated: req.isAuthenticated()}));
 });
 
-app.post("/click",  (req, res) => {
+
+//app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+let srv = http.createServer(app).listen(8000);
+
+http.createServer(clientServer).listen(3000);
+
+clientServer.use('/widget.js', express.static(`${__dirname}/public/main.js`));
+
+clientServer.post("/click",  (req, res) => {
   var connection = mysql.createConnection(param);
   const sql = "insert into widget.clicks (line_id,city_name,date) values (?,?,now());";
   connection.query(sql,[req.body.o_id,req.body.c_name], function (error, result, fields) {
@@ -380,44 +459,50 @@ app.post("/click",  (req, res) => {
   connection.end();
 });
 
-
-app.post("/client-widget",  (req, res) => {
-  let code=CryptoJS.AES.decrypt(req.body.code, "bhaerbalntrzv").toString(CryptoJS.enc.Utf8);
-  console.log(code);
-  var connection = mysql.createConnection(param);
+clientServer.post("/client-widget",  (req, res) => {
+  if (req.body.code) {
+    let code=CryptoJS.AES.decrypt(req.body.code, "bhaerbalntrzv").toString(CryptoJS.enc.Utf8);
+   console.log(code);
+    var connection = mysql.createConnection(param);
   const Query = 
-    "SELECT count(u.id) count FROM widget.users u, widget.subscriptions s, widget.plans p \
-    where s.user_id=u.id and s.plan_name=p.name \
-    and DATE_ADD(s.date_start, INTERVAL p.period MONTH)>now() and u.id=? \
-    order by s.date_start limit 1";
+    "SELECT 1 count FROM widget.users u, widget.subscriptions s, widget.plans p,widget.widgets w \
+    where s.user_id=u.id and s.plan_name=p.name and w.creator_id=u.id\
+    and DATE_ADD(s.date_start, INTERVAL p.period MONTH)>now() and w.id=? \
+    order by s.date_start desc limit 1";
   const Query2="select w.name,w.header,w.description,w.b_color, \
   w.position_desktop,w.position_mobile,w.prototype_name,o.id,o.name,o.phone,o.platform_name,o.message \
-  from widget.widgets w,widget.users u,widget.operators o where u.id=w.creator_id and o.widget_id=w.id and u.id=? and w.id=? and 1=?"
+  from widget.widgets w,widget.operators o where  o.widget_id=w.id  and w.id=? and 1=?"
     connection.beginTransaction(function(err) {
       if (err) { throw err; }
-      connection.query(Query, [idd], (error, result, fields)=> {
-        console.log(result[0].count);
+      connection.query(Query,code, (error, result, fields)=> {
         if (error) {
           return connection.rollback(function() {
             console.log(error)
             throw error;
           });
         }
-        
-        connection.query(Query2, [idd,code,result[0].count], (error, ress, fields)=> {
-          console.log(ress);
+        if(result[0]){
+          connection.query(Query2, [code,result[0].count], (error, ress, fields)=> {
+            console.log(ress);
+            
+            connection.commit(function(err) {
+              if (err) {
+                connection.rollback(function() {
+                  res.send(err);
+                  return connection.end()
+                });
+              } else
+              for (operator of ress){
+                operator.link=['https://wa.me/',operator.phone,'?text=',encodeURI(operator.message!==null ? operator.message: "")].join("")
+              }
+              res.send(ress)
+              return connection.end();
+            });
+          })
           
-          connection.commit(function(err) {
-            if (err) {
-              connection.rollback(function() {
-                return res.send(err);
-              });
-            } else
-            return res.send(ress)
-          });
-        })
+            
+        } else {res.send (''); return connection.end();}
         
-          
         
       });
     })
@@ -428,14 +513,12 @@ app.post("/client-widget",  (req, res) => {
     }
   })
   connection.end();*/
+  }
+  
 });
 
 
 
-
-
-//app.listen(port, () => console.log(`Example app listening on port ${port}!`));
-let srv = http.createServer(app).listen(8000);
 
 var path=require('path');
 
