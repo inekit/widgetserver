@@ -467,16 +467,21 @@ clientServer.post("/client-widget",  (req, res) => {
    console.log(code);
     var connection = mysql.createConnection(param);
   const Query = 
-    "SELECT 1 count FROM widget.users u, widget.subscriptions s, widget.plans p,widget.widgets w \
-    where s.user_id=u.id and s.plan_name=p.name and w.creator_id=u.id\
-    and DATE_ADD(s.date_start, INTERVAL p.period MONTH)>now() and w.id=? \
-    order by s.date_start desc limit 1";
+    "(SELECT 1 count FROM widget.users u, widget.subscriptions s, widget.plans p,widget.widgets w \
+      where s.user_id=u.id and s.plan_name=p.name and w.creator_id=u.id\
+      and DATE_ADD(s.date_start, INTERVAL p.period MONTH)>now() and w.id=?\
+      order by s.date_start desc limit 1) \
+      union all \
+      (SELECT 1 count FROM widget.users u, widget.widgets w \
+      where  w.creator_id=u.id\
+      and DATE_ADD(u.date_register, INTERVAL 1 MONTH)>now() and w.id=?\
+      limit 1)";
   const Query2="select w.name,w.header,w.description,w.b_color, \
   w.position_desktop,w.position_mobile,w.prototype_name,o.id,o.name,o.phone,o.platform_name,o.message \
   from widget.widgets w,widget.operators o where  o.widget_id=w.id  and w.id=? and 1=?"
     connection.beginTransaction(function(err) {
       if (err) { throw err; }
-      connection.query(Query,code, (error, result, fields)=> {
+      connection.query(Query,[code,code], (error, result, fields)=> {
         if (error) {
           return connection.rollback(function() {
             console.log(error)
