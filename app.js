@@ -462,63 +462,13 @@ clientServer.post("/click",  (req, res) => {
 });
 
 clientServer.post("/client-widget",  (req, res) => {
-  console.log('code'+req.body.code);
+  console.log(req.body.code)
   if (req.body.code) {
     let code=CryptoJS.AES.decrypt(req.body.code, "bhaerbalntrzv").toString(CryptoJS.enc.Utf8);
    console.log(code);
-    var connection = mysql.createConnection(param);
-  const Query = 
-    "SELECT 1 count FROM widget.users u, widget.subscriptions s, widget.plans p,widget.widgets w \
-    where s.user_id=u.id and s.plan_name=p.name and w.creator_id=u.id\
-    and DATE_ADD(s.date_start, INTERVAL p.period MONTH)>now() and w.id=? \
-    order by s.date_start desc limit 1";
-  const Query2="select w.name,w.header,w.description,w.b_color, \
-  w.position_desktop,w.position_mobile,w.prototype_name,o.id,o.name,o.phone,o.platform_name,o.message \
-  from widget.widgets w,widget.operators o where  o.widget_id=w.id  and w.id=? and 1=?"
-    connection.beginTransaction(function(err) {
-      if (err) { throw err; }
-      connection.query(Query,code, (error, result, fields)=> {
-        if (error) {
-          return connection.rollback(function() {
-            console.log(error)
-            throw error;
-          });
-        }
-        if(result[0]){
-          connection.query(Query2, [code,result[0].count], (error, ress, fields)=> {
-            console.log(ress);
-            
-            connection.commit(function(err) {
-              if (err) {
-                connection.rollback(function() {
-                  res.send(err);
-                  return connection.end()
-                });
-              } else
-              for (operator of ress){
-                operator.link=['https://wa.me/',operator.phone,'?text=',encodeURI(operator.message!==null ? operator.message: "")].join("")
-              }
-              res.send(ress)
-              return connection.end();
-            });
-          })
-          
-            
-        } else {res.send (''); return connection.end();}
-        
-        
-      });
-    })
-  /*connection.query(sql, [code], function (error, result, fields) {
-    if(result){
-    div="<p>"+result[0].text+"</p>"
-    return res.send(JSON.stringify({widget:div,link:['location.href = "https://wa.me/',result[0].phone,'?text=',encodeURI(result[0].message),'"'].join("")}));
-    }
-  })
-  connection.end();*/
+    res.send(code);
   }
-  
-});
+})
 
 
 
