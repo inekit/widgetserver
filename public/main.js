@@ -6,7 +6,7 @@ const myApi = axios.create();
 
 function widget_whatsapp_help_init(key){
 myApi
-  .post("http://localhost:3000/client-widget/",{code:key})
+  .post("http://188.120.239.117:3000/client-widget/",{code:key})
   .then((res) => {
     let widget=document.querySelector('[class*="whatsapp_frame_'+key+'"]');
     let button=document.createElement('div');
@@ -77,7 +77,7 @@ function sendClick(id,link){
   
   window.open(link);
   myApi
-        .post('http://localhost:3000/click/', {
+        .post('http://188.120.239.117:3000/click/', {
           o_id: id,
           c_name: 'Test city',
         })
