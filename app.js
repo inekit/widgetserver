@@ -346,7 +346,7 @@ app.get("/id", auth, (req, res) => {
   var connection = mysql.createConnection(param);
   idd = req.session.passport.user.toString();
   const dialog = [idd];
-  const sql = "select id,email,nick,date_register from widget.users where id=(?) limit 1";
+  const sql = "select id,email,nick,DATE_ADD(date_register, INTERVAL 1 MONTH) from widget.users where id=(?) limit 1";
   connection.query(sql, dialog, function (error, result, fields) {
     return res.send(result);
   });
