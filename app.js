@@ -462,7 +462,7 @@ clientServer.post("/click",  (req, res) => {
 });
 
 clientServer.post("/client-widget",  (req, res) => {
-  console.log(req.body.code);
+  console.log('code'+req.body.code);
   if (req.body.code) {
     let code=CryptoJS.AES.decrypt(req.body.code, "bhaerbalntrzv").toString(CryptoJS.enc.Utf8);
    console.log(code);
